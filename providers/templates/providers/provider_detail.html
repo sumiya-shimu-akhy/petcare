@@ -1,0 +1,90 @@
+<a href="/providers/">&larr; Back to providers</a>
+
+<h1>{{ provider.user.username }} - {{ provider.get_service_type_display }}</h1>
+<p>Area: {{ provider.area }} | Experience: {{ provider.experience_years }} years | Fee: {{ provider.fee }} BDT</p>
+<p>{{ provider.bio }}</p>
+
+<h3>Rating: <span id="avg">-</span> (<span id="count">0</span> reviews)</h3>
+<hr>
+
+{% if user.is_authenticated %}
+  <h3>Leave a review</h3>
+  <form id="review-form">
+    {% csrf_token %}
+    <select name="rating" id="rating">
+      <option value="">Rating</option>
+      <option value="5">5 - Excellent</option>
+      <option value="4">4 - Good</option>
+      <option value="3">3 - Okay</option>
+      <option value="2">2 - Poor</option>
+      <option value="1">1 - Bad</option>
+    </select>
+    <br>
+    <textarea name="comment" id="comment" rows="3" cols="40" placeholder="Write your comment"></textarea>
+    <br>
+    <button type="submit">Post</button>
+    <span id="msg" style="color:red;"></span>
+  </form>
+{% else %}
+  <p><a href="/login/">Login</a> to leave a review.</p>
+{% endif %}
+
+<hr>
+<h3>Reviews</h3>
+<div id="reviews"></div>
+
+<script>
+const providerId = {{ provider.id }};
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function loadReviews() {
+  fetch('/reviews/' + providerId + '/')
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById('avg').textContent = data.average !== null ? data.average + ' / 5' : '-';
+      document.getElementById('count').textContent = data.count;
+      const box = document.getElementById('reviews');
+      if (data.reviews.length === 0) {
+        box.innerHTML = '<p>No reviews yet.</p>';
+        return;
+      }
+      box.innerHTML = data.reviews.map(r =>
+        '<div><b>' + escapeHtml(r.user) + '</b> - ' + '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating) +
+        '<br>' + escapeHtml(r.comment) +
+        '<br><small>' + r.time + '</small></div><hr>'
+      ).join('');
+    });
+}
+
+const form = document.getElementById('review-form');
+if (form) {
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const msg = document.getElementById('msg');
+    msg.textContent = '';
+    fetch('/reviews/' + providerId + '/add/', {
+      method: 'POST',
+      headers: {'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value},
+      body: new FormData(form)
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          msg.textContent = ' ' + data.error;
+        } else {
+          document.getElementById('comment').value = '';
+          document.getElementById('rating').value = '';
+          loadReviews();
+        }
+      });
+  });
+}
+
+loadReviews();
+setInterval(loadReviews, 5000);
+</script>

@@ -15,7 +15,7 @@
 
 {% for p in page_obj %}
   <div>
-    <h3>{{ p.user.username }} - {{ p.get_service_type_display }}</h3>
+    <h3><a href="/providers/{{ p.id }}/">{{ p.user.username }} - {{ p.get_service_type_display }}</a></h3>
     <p>Area: {{ p.area }} | Experience: {{ p.experience_years }} years | Fee: {{ p.fee }} BDT</p>
     <p>{{ p.bio }}</p>
   </div>

@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from .forms import ProviderForm
@@ -35,5 +35,8 @@ def provider_list(request):
         'page_obj': page_obj,
         'service': service,
         'area': area,
-        'service_types': ProviderProfile.SERVICE_TYPES,
+        'service_types': ProviderProfile.SERVICE_TYPES, 
     })
+def provider_detail(request, pk):
+    provider = get_object_or_404(ProviderProfile, pk=pk, is_verified=True)
+    return render(request, 'providers/provider_detail.html', {'provider': provider})
