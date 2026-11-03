@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect
+from django.http import JsonResponse
 from django.contrib.auth import login
+from django.contrib.auth.models import User
 from .forms import SignUpForm
 from .models import Profile
 
@@ -26,3 +28,9 @@ def signup(request):
     else:
         form = SignUpForm()
     return render(request, 'accounts/signup.html', {'form': form})
+
+
+def check_username(request):
+    username = request.GET.get('username', '').strip()
+    exists = User.objects.filter(username__iexact=username).exists()
+    return JsonResponse({'exists': exists})

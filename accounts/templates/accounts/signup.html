@@ -4,3 +4,32 @@
   {{ form.as_p }}
   <button type="submit">Sign Up</button>
 </form>
+
+<script>
+const usernameInput = document.getElementById('id_username');
+const message = document.createElement('span');
+usernameInput.insertAdjacentElement('afterend', message);
+let timer;
+
+usernameInput.addEventListener('input', () => {
+  clearTimeout(timer);
+  const value = usernameInput.value.trim();
+  if (!value) {
+    message.textContent = '';
+    return;
+  }
+  timer = setTimeout(() => {
+    fetch('/check-username/?username=' + encodeURIComponent(value))
+      .then(response => response.json())
+      .then(data => {
+        if (data.exists) {
+          message.textContent = ' ❌ Already taken';
+          message.style.color = 'red';
+        } else {
+          message.textContent = ' ✅ Available';
+          message.style.color = 'green';
+        }
+      });
+  }, 300);
+});
+</script>
