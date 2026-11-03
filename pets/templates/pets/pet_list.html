@@ -1,0 +1,13 @@
+<h1>My Pets</h1>
+<a href="/pets/add/">+ Add a Pet</a> | <a href="/">Home</a>
+<hr>
+{% for pet in pets %}
+  <div>
+    <h3>{{ pet.name }} ({{ pet.get_pet_type_display }})</h3>
+    <p>Breed: {{ pet.breed }} | Age: {{ pet.age }} years</p>
+    <p>Medical history: {{ pet.medical_history }}</p>
+  </div>
+  <hr>
+{% empty %}
+  <p>You haven't added any pets yet.</p>
+{% endfor %}
