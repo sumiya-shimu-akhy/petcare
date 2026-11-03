@@ -1,0 +1,35 @@
+<h1>Find a Service Provider</h1>
+<a href="/">Home</a>
+
+<form method="get">
+  <select name="service">
+    <option value="">All services</option>
+    {% for value, label in service_types %}
+      <option value="{{ value }}" {% if value == service %}selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+  </select>
+  <input type="text" name="area" placeholder="Area" value="{{ area }}">
+  <button type="submit">Search</button>
+</form>
+<hr>
+
+{% for p in page_obj %}
+  <div>
+    <h3>{{ p.user.username }} - {{ p.get_service_type_display }}</h3>
+    <p>Area: {{ p.area }} | Experience: {{ p.experience_years }} years | Fee: {{ p.fee }} BDT</p>
+    <p>{{ p.bio }}</p>
+  </div>
+  <hr>
+{% empty %}
+  <p>No providers found.</p>
+{% endfor %}
+
+<div>
+  {% if page_obj.has_previous %}
+    <a href="?service={{ service }}&area={{ area }}&page={{ page_obj.previous_page_number }}">Previous</a>
+  {% endif %}
+  Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+  {% if page_obj.has_next %}
+    <a href="?service={{ service }}&area={{ area }}&page={{ page_obj.next_page_number }}">Next</a>
+  {% endif %}
+</div>

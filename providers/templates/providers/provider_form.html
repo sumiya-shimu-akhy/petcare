@@ -1,0 +1,8 @@
+<h1>My Provider Profile</h1>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Save</button>
+</form>
+<p>Note: your profile will be visible to others after admin approval.</p>
+<a href="/">Home</a>

@@ -1,7 +1,7 @@
 <h1>Pet Care Finder</h1>
 {% if user.is_authenticated %}
   <p>Welcome, {{ user.username }}!</p>
-  <p><a href="/pets/">My Pets</a></p>
+  <p><a href="/pets/">My Pets</a> | <a href="/providers/profile/">My Provider Profile</a></p>
   <form method="post" action="/logout/">
     {% csrf_token %}
     <button type="submit">Logout</button>
@@ -9,3 +9,4 @@
 {% else %}
   <a href="/signup/">Sign up</a> | <a href="/login/">Login</a>
 {% endif %}
+<p><a href="/providers/">Find Service Providers</a></p>
