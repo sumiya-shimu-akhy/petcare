@@ -5,6 +5,12 @@
 <p>{{ provider.bio }}</p>
 
 <h3>Rating: <span id="avg">-</span> (<span id="count">0</span> reviews)</h3>
+
+<div>
+  <button type="button" id="like-btn" onclick="react(1)">👍 Like (<span id="likes">0</span>)</button>
+  <button type="button" id="dislike-btn" onclick="react(-1)">👎 Dislike (<span id="dislikes">0</span>)</button>
+  <span id="react-msg" style="color:red;"></span>
+</div>
 <hr>
 
 {% if user.is_authenticated %}
@@ -26,7 +32,7 @@
     <span id="msg" style="color:red;"></span>
   </form>
 {% else %}
-  <p><a href="/login/">Login</a> to leave a review.</p>
+  <p><a href="/login/">Login</a> to leave a review or react.</p>
 {% endif %}
 
 <hr>
@@ -35,6 +41,7 @@
 
 <script>
 const providerId = {{ provider.id }};
+const csrfToken = '{{ csrf_token }}';
 
 function escapeHtml(text) {
   const div = document.createElement('div');
@@ -58,6 +65,37 @@ function loadReviews() {
         '<br>' + escapeHtml(r.comment) +
         '<br><small>' + r.time + '</small></div><hr>'
       ).join('');
+    });
+}
+
+function loadReactions() {
+  fetch('/reviews/' + providerId + '/reactions/')
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById('likes').textContent = data.likes;
+      document.getElementById('dislikes').textContent = data.dislikes;
+      document.getElementById('like-btn').style.fontWeight = data.mine === 1 ? 'bold' : 'normal';
+      document.getElementById('dislike-btn').style.fontWeight = data.mine === -1 ? 'bold' : 'normal';
+    });
+}
+
+function react(value) {
+  const msg = document.getElementById('react-msg');
+  msg.textContent = '';
+  const body = new FormData();
+  body.append('value', value);
+  fetch('/reviews/' + providerId + '/react/', {
+    method: 'POST',
+    headers: {'X-CSRFToken': csrfToken},
+    body: body
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.error) {
+        msg.textContent = ' ' + data.error;
+      } else {
+        loadReactions();
+      }
     });
 }
 
@@ -86,5 +124,7 @@ if (form) {
 }
 
 loadReviews();
+loadReactions();
 setInterval(loadReviews, 5000);
+setInterval(loadReactions, 5000);
 </script>
