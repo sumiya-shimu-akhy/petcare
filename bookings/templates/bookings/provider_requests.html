@@ -1,0 +1,28 @@
+<h1>Booking Requests</h1>
+<a href="/">Home</a>
+<hr>
+{% if not profile %}
+  <p>You don't have a provider profile yet. <a href="/providers/profile/">Create one</a></p>
+{% endif %}
+{% for b in bookings %}
+  <div>
+    <h3>{{ b.owner.username }} - Pet: {{ b.pet.name }} ({{ b.pet.get_pet_type_display }})</h3>
+    <p>Date: {{ b.date }} | Status: <b>{{ b.get_status_display }}</b></p>
+    <p>Note: {{ b.note }}</p>
+    {% if b.status == 'pending' %}
+      <form method="post" action="/bookings/{{ b.id }}/status/" style="display:inline;">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="accept">
+        <button type="submit">Accept</button>
+      </form>
+      <form method="post" action="/bookings/{{ b.id }}/status/" style="display:inline;">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="reject">
+        <button type="submit">Reject</button>
+      </form>
+    {% endif %}
+  </div>
+  <hr>
+{% empty %}
+  <p>No requests yet.</p>
+{% endfor %}

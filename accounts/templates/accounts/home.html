@@ -1,7 +1,8 @@
 <h1>Pet Care Finder</h1>
 {% if user.is_authenticated %}
   <p>Welcome, {{ user.username }}!</p>
-  <p><a href="/pets/">My Pets</a> | <a href="/providers/profile/">My Provider Profile</a></p>
+  <p><a href="/pets/">My Pets</a> | <a href="/bookings/mine/">My Bookings</a></p>
+  <p><a href="/providers/profile/">My Provider Profile</a> | <a href="/bookings/requests/">Booking Requests</a></p>
   <form method="post" action="/logout/">
     {% csrf_token %}
     <button type="submit">Logout</button>
