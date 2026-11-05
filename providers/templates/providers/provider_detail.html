@@ -1,63 +1,80 @@
-<a href="/providers/">&larr; Back to providers</a>
+{% extends "base.html" %}
 
-{% if provider.photo %}<img src="{{ provider.photo.url }}" width="150" style="border-radius:8px;">{% endif %}
-<h1>{{ provider.user.username }} - {{ provider.get_service_type_display }}</h1>
-<p>Area: {{ provider.area }} | Experience: {{ provider.experience_years }} years | Fee: {{ provider.fee }} BDT</p>
-<p>{{ provider.bio }}</p>
+{% block content %}
+<a href="/providers/" class="text-sm text-indigo-600 hover:underline">&larr; Back to providers</a>
+
+<div class="bg-white rounded-lg shadow p-5 mt-3">
+  <div class="flex gap-4 items-center">
+    {% if provider.photo %}<img src="{{ provider.photo.url }}" class="w-28 h-28 object-cover rounded-lg">{% endif %}
+    <div>
+      <h1 class="text-2xl font-bold">{{ provider.user.username }} - {{ provider.get_service_type_display }}</h1>
+      <p class="text-sm text-gray-600">Area: {{ provider.area }} | Experience: {{ provider.experience_years }} years | Fee: {{ provider.fee }} BDT</p>
+      <p class="mt-1">{{ provider.bio }}</p>
+    </div>
+  </div>
+
+  <h3 class="mt-4 font-semibold">Rating: <span id="avg">-</span> (<span id="count">0</span> reviews)</h3>
+
+  <div class="flex flex-wrap items-center gap-2 mt-3">
+    <button type="button" id="like-btn" onclick="react(1)" class="border px-3 py-1 rounded hover:bg-gray-100">👍 Like (<span id="likes">0</span>)</button>
+    <button type="button" id="dislike-btn" onclick="react(-1)" class="border px-3 py-1 rounded hover:bg-gray-100">👎 Dislike (<span id="dislikes">0</span>)</button>
+    <a href="/bookings/new/{{ provider.id }}/" class="bg-indigo-600 text-white px-4 py-1 rounded hover:bg-indigo-700">📅 Book an appointment</a>
+    <span id="react-msg" class="text-red-600 text-sm"></span>
+  </div>
+</div>
+
 {% if provider.embed_url %}
-  <h3>Demo Video</h3>
+<div class="bg-white rounded-lg shadow p-5 mt-4">
+  <h3 class="font-semibold mb-2">Demo Video</h3>
   <iframe
     width="100%"
     height="315"
-    style="border:0; max-width:560px;"
+    class="max-w-xl rounded"
+    style="border:0;"
     src="{{ provider.embed_url }}"
+    referrerpolicy="strict-origin-when-cross-origin"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
     allowfullscreen>
   </iframe>
-{% endif %}
-<h3>Location</h3>
-<iframe
-  width="100%"
-  height="300"
-  style="border:0; max-width:600px;"
-  loading="lazy"
-  src="https://maps.google.com/maps?q={{ provider.area|urlencode }}&output=embed">
-</iframe>
-<p><a href="/bookings/new/{{ provider.id }}/">📅 Book an appointment</a></p>
-
-<h3>Rating: <span id="avg">-</span> (<span id="count">0</span> reviews)</h3>
-
-<div>
-  <button type="button" id="like-btn" onclick="react(1)">👍 Like (<span id="likes">0</span>)</button>
-  <button type="button" id="dislike-btn" onclick="react(-1)">👎 Dislike (<span id="dislikes">0</span>)</button>
-  <span id="react-msg" style="color:red;"></span>
 </div>
-<hr>
-
-{% if user.is_authenticated %}
-  <h3>Leave a review</h3>
-  <form id="review-form">
-    {% csrf_token %}
-    <select name="rating" id="rating">
-      <option value="">Rating</option>
-      <option value="5">5 - Excellent</option>
-      <option value="4">4 - Good</option>
-      <option value="3">3 - Okay</option>
-      <option value="2">2 - Poor</option>
-      <option value="1">1 - Bad</option>
-    </select>
-    <br>
-    <textarea name="comment" id="comment" rows="3" cols="40" placeholder="Write your comment"></textarea>
-    <br>
-    <button type="submit">Post</button>
-    <span id="msg" style="color:red;"></span>
-  </form>
-{% else %}
-  <p><a href="/login/">Login</a> to leave a review or react.</p>
 {% endif %}
 
-<hr>
-<h3>Reviews</h3>
-<div id="reviews"></div>
+<div class="bg-white rounded-lg shadow p-5 mt-4">
+  <h3 class="font-semibold mb-2">Location</h3>
+  <iframe
+    width="100%"
+    height="300"
+    class="max-w-xl rounded"
+    style="border:0;"
+    loading="lazy"
+    src="https://maps.google.com/maps?q={{ provider.area|urlencode }}&output=embed">
+  </iframe>
+</div>
+
+<div class="bg-white rounded-lg shadow p-5 mt-4">
+  {% if user.is_authenticated %}
+    <h3 class="font-semibold mb-2">Leave a review</h3>
+    <form id="review-form" class="space-y-2">
+      {% csrf_token %}
+      <select name="rating" id="rating" class="border rounded px-2 py-1">
+        <option value="">Rating</option>
+        <option value="5">5 - Excellent</option>
+        <option value="4">4 - Good</option>
+        <option value="3">3 - Okay</option>
+        <option value="2">2 - Poor</option>
+        <option value="1">1 - Bad</option>
+      </select>
+      <textarea name="comment" id="comment" rows="3" placeholder="Write your comment" class="border rounded w-full px-2 py-1"></textarea>
+      <button type="submit" class="bg-indigo-600 text-white px-4 py-1 rounded hover:bg-indigo-700">Post</button>
+      <span id="msg" class="text-red-600 text-sm"></span>
+    </form>
+  {% else %}
+    <p><a href="/login/" class="text-indigo-600 hover:underline">Login</a> to leave a review or react.</p>
+  {% endif %}
+
+  <h3 class="font-semibold mt-5 mb-2">Reviews</h3>
+  <div id="reviews"></div>
+</div>
 
 <script>
 const providerId = {{ provider.id }};
@@ -77,13 +94,13 @@ function loadReviews() {
       document.getElementById('count').textContent = data.count;
       const box = document.getElementById('reviews');
       if (data.reviews.length === 0) {
-        box.innerHTML = '<p>No reviews yet.</p>';
+        box.innerHTML = '<p class="text-gray-500">No reviews yet.</p>';
         return;
       }
       box.innerHTML = data.reviews.map(r =>
-        '<div><b>' + escapeHtml(r.user) + '</b> - ' + '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating) +
+        '<div class="border-t py-2"><b>' + escapeHtml(r.user) + '</b> - ' + '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating) +
         '<br>' + escapeHtml(r.comment) +
-        '<br><small>' + r.time + '</small></div><hr>'
+        '<br><small class="text-gray-500">' + r.time + '</small></div>'
       ).join('');
     });
 }
@@ -141,10 +158,11 @@ if (form) {
         }
       });
   });
-}1
+}
 
 loadReviews();
 loadReactions();
 setInterval(loadReviews, 5000);
 setInterval(loadReactions, 5000);
 </script>
+{% endblock %}

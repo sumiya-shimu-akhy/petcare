@@ -1,13 +1,21 @@
-<h1>My Bookings</h1>
-<a href="/">Home</a> | <a href="/providers/">Find providers</a>
-<hr>
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">My Bookings</h1>
+
 {% for b in bookings %}
-  <div>
-    <h3>{{ b.provider.user.username }} - {{ b.provider.get_service_type_display }}</h3>
-    <p>Pet: {{ b.pet.name }} | Date: {{ b.date }} | Status: <b>{{ b.get_status_display }}</b></p>
-    <p>Note: {{ b.note }}</p>
+  <div class="bg-white rounded-lg shadow p-4 mb-3">
+    <h3 class="text-lg font-semibold">{{ b.provider.user.username }} - {{ b.provider.get_service_type_display }}</h3>
+    <p class="text-sm text-gray-600">Pet: {{ b.pet.name }} | Date: {{ b.date }}</p>
+    <p class="text-sm">Status:
+      <span class="font-semibold
+        {% if b.status == 'accepted' %}text-green-600{% elif b.status == 'rejected' %}text-red-600{% else %}text-yellow-600{% endif %}">
+        {{ b.get_status_display }}
+      </span>
+    </p>
+    <p class="text-sm text-gray-600">Note: {{ b.note }}</p>
   </div>
-  <hr>
 {% empty %}
-  <p>No bookings yet.</p>
+  <p class="text-gray-500">No bookings yet.</p>
 {% endfor %}
+{% endblock %}

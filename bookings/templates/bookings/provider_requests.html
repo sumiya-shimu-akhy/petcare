@@ -1,28 +1,39 @@
-<h1>Booking Requests</h1>
-<a href="/">Home</a>
-<hr>
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Booking Requests</h1>
+
 {% if not profile %}
-  <p>You don't have a provider profile yet. <a href="/providers/profile/">Create one</a></p>
+  <p class="text-gray-600 mb-3">You don't have a provider profile yet. <a href="/providers/profile/" class="text-indigo-600 underline">Create one</a></p>
 {% endif %}
+
 {% for b in bookings %}
-  <div>
-    <h3>{{ b.owner.username }} - Pet: {{ b.pet.name }} ({{ b.pet.get_pet_type_display }})</h3>
-    <p>Date: {{ b.date }} | Status: <b>{{ b.get_status_display }}</b></p>
-    <p>Note: {{ b.note }}</p>
+  <div class="bg-white rounded-lg shadow p-4 mb-3">
+    <h3 class="text-lg font-semibold">{{ b.owner.username }} <span class="text-sm text-gray-500">- Pet: {{ b.pet.name }} ({{ b.pet.get_pet_type_display }})</span></h3>
+    <p class="text-sm text-gray-600">Date: {{ b.date }}</p>
+    <p class="text-sm">Status:
+      <span class="font-semibold
+        {% if b.status == 'accepted' %}text-green-600{% elif b.status == 'rejected' %}text-red-600{% else %}text-yellow-600{% endif %}">
+        {{ b.get_status_display }}
+      </span>
+    </p>
+    <p class="text-sm text-gray-600">Note: {{ b.note }}</p>
     {% if b.status == 'pending' %}
-      <form method="post" action="/bookings/{{ b.id }}/status/" style="display:inline;">
-        {% csrf_token %}
-        <input type="hidden" name="action" value="accept">
-        <button type="submit">Accept</button>
-      </form>
-      <form method="post" action="/bookings/{{ b.id }}/status/" style="display:inline;">
-        {% csrf_token %}
-        <input type="hidden" name="action" value="reject">
-        <button type="submit">Reject</button>
-      </form>
+      <div class="flex gap-2 mt-2">
+        <form method="post" action="/bookings/{{ b.id }}/status/">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="accept">
+          <button type="submit" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">Accept</button>
+        </form>
+        <form method="post" action="/bookings/{{ b.id }}/status/">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="reject">
+          <button type="submit" class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700">Reject</button>
+        </form>
+      </div>
     {% endif %}
   </div>
-  <hr>
 {% empty %}
-  <p>No requests yet.</p>
+  <p class="text-gray-500">No requests yet.</p>
 {% endfor %}
+{% endblock %}

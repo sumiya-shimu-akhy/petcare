@@ -1,8 +1,13 @@
-<h1>My Provider Profile</h1>
-<form method="post" enctype="multipart/form-data">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Save</button>
-</form>
-<p>Note: your profile will be visible to others after admin approval.</p>
-<a href="/">Home</a>
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-white rounded-lg shadow p-6">
+  <h1 class="text-2xl font-bold mb-4">My Provider Profile</h1>
+  <form method="post" enctype="multipart/form-data" class="space-y-3">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700">Save</button>
+  </form>
+  <p class="mt-4 text-sm text-gray-600">Note: your profile will be visible to others after admin approval.</p>
+</div>
+{% endblock %}
