@@ -1,13 +1,9 @@
-<h1>Pet Care Finder</h1>
-{% if user.is_authenticated %}
-  <p>Welcome, {{ user.username }}!</p>
-  <p><a href="/pets/">My Pets</a> | <a href="/bookings/mine/">My Bookings</a></p>
-  <p><a href="/providers/profile/">My Provider Profile</a> | <a href="/bookings/requests/">Booking Requests</a></p>
-  <form method="post" action="/logout/">
-    {% csrf_token %}
-    <button type="submit">Logout</button>
-  </form>
-{% else %}
-  <a href="/signup/">Sign up</a> | <a href="/login/">Login</a>
-{% endif %}
-<p><a href="/providers/">Find Service Providers</a></p>
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="bg-white rounded-lg shadow p-8 text-center">
+    <h1 class="text-3xl font-bold text-indigo-600 mb-2">Pet Care Finder</h1>
+    <p class="text-gray-600 mb-6">Find trusted vets, groomers, pet sitters and trainers near you.</p>
+    <a href="/providers/" class="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700">Find a Provider</a>
+  </div>
+{% endblock %}
