@@ -4,6 +4,16 @@
 <h1>{{ provider.user.username }} - {{ provider.get_service_type_display }}</h1>
 <p>Area: {{ provider.area }} | Experience: {{ provider.experience_years }} years | Fee: {{ provider.fee }} BDT</p>
 <p>{{ provider.bio }}</p>
+{% if provider.embed_url %}
+  <h3>Demo Video</h3>
+  <iframe
+    width="100%"
+    height="315"
+    style="border:0; max-width:560px;"
+    src="{{ provider.embed_url }}"
+    allowfullscreen>
+  </iframe>
+{% endif %}
 <h3>Location</h3>
 <iframe
   width="100%"

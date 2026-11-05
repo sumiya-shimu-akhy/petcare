@@ -1,3 +1,4 @@
+import re
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -16,7 +17,16 @@ class ProviderProfile(models.Model):
     area = models.CharField(max_length=100)
     bio = models.TextField(blank=True)
     photo = models.ImageField(upload_to='provider_photos/', blank=True, null=True)
+    video_url = models.URLField(blank=True, help_text="YouTube link of your demo video")
     is_verified = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.user.username} - {self.get_service_type_display()}"
+
+    @property
+    def embed_url(self):
+        url = (self.video_url or '').strip()
+        match = re.search(r'(?:youtu\.be/|v=|embed/|shorts/)([A-Za-z0-9_-]{11})', url)
+        if match:
+            return f"https://www.youtube.com/embed/{match.group(1)}"
+        return ''
