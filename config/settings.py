@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'providers',
     'reviews',
     'bookings',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
