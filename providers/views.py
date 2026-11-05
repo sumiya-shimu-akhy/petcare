@@ -9,7 +9,7 @@ from .models import ProviderProfile
 def provider_edit(request):
     profile = ProviderProfile.objects.filter(user=request.user).first()
     if request.method == 'POST':
-        form = ProviderForm(request.POST, instance=profile)
+        form = ProviderForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
             p = form.save(commit=False)
             p.user = request.user
@@ -35,8 +35,10 @@ def provider_list(request):
         'page_obj': page_obj,
         'service': service,
         'area': area,
-        'service_types': ProviderProfile.SERVICE_TYPES, 
+        'service_types': ProviderProfile.SERVICE_TYPES,
     })
+
+
 def provider_detail(request, pk):
     provider = get_object_or_404(ProviderProfile, pk=pk, is_verified=True)
     return render(request, 'providers/provider_detail.html', {'provider': provider})

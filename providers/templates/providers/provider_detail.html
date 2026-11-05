@@ -1,5 +1,6 @@
 <a href="/providers/">&larr; Back to providers</a>
 
+{% if provider.photo %}<img src="{{ provider.photo.url }}" width="150" style="border-radius:8px;">{% endif %}
 <h1>{{ provider.user.username }} - {{ provider.get_service_type_display }}</h1>
 <p>Area: {{ provider.area }} | Experience: {{ provider.experience_years }} years | Fee: {{ provider.fee }} BDT</p>
 <p>{{ provider.bio }}</p>

@@ -15,6 +15,7 @@ class ProviderProfile(models.Model):
     fee = models.PositiveIntegerField(help_text="Fee in BDT per visit")
     area = models.CharField(max_length=100)
     bio = models.TextField(blank=True)
+    photo = models.ImageField(upload_to='provider_photos/', blank=True, null=True)
     is_verified = models.BooleanField(default=False)
 
     def __str__(self):
