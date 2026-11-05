@@ -1,7 +1,13 @@
-<h1>Login</h1>
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Login</button>
-</form>
-<p>No account? <a href="/signup/">Sign up</a></p>
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-white rounded-lg shadow p-6">
+  <h1 class="text-2xl font-bold mb-4">Login</h1>
+  <form method="post" class="space-y-3">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700">Login</button>
+  </form>
+  <p class="mt-4 text-sm text-gray-600">No account? <a href="/signup/" class="text-indigo-600 hover:underline">Sign up</a></p>
+</div>
+{% endblock %}

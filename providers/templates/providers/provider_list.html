@@ -1,36 +1,39 @@
-<h1>Find a Service Provider</h1>
-<a href="/">Home</a>
+{% extends "base.html" %}
 
-<form method="get">
-  <select name="service">
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Find a Service Provider</h1>
+
+<form method="get" class="bg-white rounded-lg shadow p-4 mb-4 flex flex-wrap gap-2">
+  <select name="service" class="border rounded px-2 py-1">
     <option value="">All services</option>
     {% for value, label in service_types %}
       <option value="{{ value }}" {% if value == service %}selected{% endif %}>{{ label }}</option>
     {% endfor %}
   </select>
-  <input type="text" name="area" placeholder="Area" value="{{ area }}">
-  <button type="submit">Search</button>
+  <input type="text" name="area" placeholder="Area" value="{{ area }}" class="border rounded px-2 py-1">
+  <button type="submit" class="bg-indigo-600 text-white px-4 py-1 rounded hover:bg-indigo-700">Search</button>
 </form>
-<hr>
 
 {% for p in page_obj %}
-  <div>
-    {% if p.photo %}<img src="{{ p.photo.url }}" width="80" style="border-radius:8px;">{% endif %}
-    <h3><a href="/providers/{{ p.id }}/">{{ p.user.username }} - {{ p.get_service_type_display }}</a></h3>
-    <p>Area: {{ p.area }} | Experience: {{ p.experience_years }} years | Fee: {{ p.fee }} BDT</p>
-    <p>{{ p.bio }}</p>
+  <div class="bg-white rounded-lg shadow p-4 mb-3 flex gap-4">
+    {% if p.photo %}<img src="{{ p.photo.url }}" class="w-20 h-20 object-cover rounded-lg">{% endif %}
+    <div>
+      <h3 class="text-lg font-semibold"><a href="/providers/{{ p.id }}/" class="text-indigo-600 hover:underline">{{ p.user.username }} - {{ p.get_service_type_display }}</a></h3>
+      <p class="text-sm text-gray-600">Area: {{ p.area }} | Experience: {{ p.experience_years }} years | Fee: {{ p.fee }} BDT</p>
+      <p class="text-sm">{{ p.bio }}</p>
+    </div>
   </div>
-  <hr>
 {% empty %}
-  <p>No providers found.</p>
+  <p class="text-gray-500">No providers found.</p>
 {% endfor %}
 
-<div>
+<div class="flex items-center gap-3 mt-4">
   {% if page_obj.has_previous %}
-    <a href="?service={{ service }}&area={{ area }}&page={{ page_obj.previous_page_number }}">Previous</a>
+    <a href="?service={{ service }}&area={{ area }}&page={{ page_obj.previous_page_number }}" class="text-indigo-600 hover:underline">Previous</a>
   {% endif %}
-  Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+  <span class="text-sm text-gray-600">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
   {% if page_obj.has_next %}
-    <a href="?service={{ service }}&area={{ area }}&page={{ page_obj.next_page_number }}">Next</a>
+    <a href="?service={{ service }}&area={{ area }}&page={{ page_obj.next_page_number }}" class="text-indigo-600 hover:underline">Next</a>
   {% endif %}
 </div>
+{% endblock %}

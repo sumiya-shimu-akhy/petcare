@@ -1,13 +1,18 @@
-<h1>My Pets</h1>
-<a href="/pets/add/">+ Add a Pet</a> | <a href="/">Home</a>
-<hr>
+{% extends "base.html" %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-2xl font-bold">My Pets</h1>
+  <a href="/pets/add/" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">+ Add a Pet</a>
+</div>
+
 {% for pet in pets %}
-  <div>
-    <h3>{{ pet.name }} ({{ pet.get_pet_type_display }})</h3>
-    <p>Breed: {{ pet.breed }} | Age: {{ pet.age }} years</p>
-    <p>Medical history: {{ pet.medical_history }}</p>
+  <div class="bg-white rounded-lg shadow p-4 mb-3">
+    <h3 class="text-lg font-semibold">{{ pet.name }} <span class="text-sm text-gray-500">({{ pet.get_pet_type_display }})</span></h3>
+    <p class="text-sm text-gray-600">Breed: {{ pet.breed }} | Age: {{ pet.age }} years</p>
+    <p class="text-sm text-gray-600">Medical history: {{ pet.medical_history }}</p>
   </div>
-  <hr>
 {% empty %}
-  <p>You haven't added any pets yet.</p>
+  <p class="text-gray-500">You haven't added any pets yet.</p>
 {% endfor %}
+{% endblock %}
