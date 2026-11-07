@@ -128,11 +128,25 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 
+
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 
+def _read_email_password():
+    f = BASE_DIR / 'email_password.txt'
+    return f.read_text().strip() if f.exists() else ''
+
+
 MAILERS = {
-    'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
+    "default": {
+        "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+        "OPTIONS": {
+            "host": "smtp.gmail.com",
+            "port": 587,
+            "use_tls": True,
+            "username": "sumiyashimuakhy@gmail.com",
+            "password": _read_email_password(),
+        },
     },
 }
+DEFAULT_FROM_EMAIL ="sumiyashimuakhy@gmail.com"

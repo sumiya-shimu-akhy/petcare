@@ -4,6 +4,7 @@ from .models import Profile
 
 
 class SignUpForm(forms.ModelForm):
+    email = forms.EmailField()
     password = forms.CharField(widget=forms.PasswordInput)
     role = forms.ChoiceField(choices=Profile.ROLE_CHOICES)
     phone = forms.CharField(max_length=15, required=False)
@@ -12,3 +13,9 @@ class SignUpForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['username', 'email', 'password']
+
+    def clean_email(self):
+        email = self.cleaned_data['email'].strip()
+        if User.objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError("This email is already registered.")
+        return email
