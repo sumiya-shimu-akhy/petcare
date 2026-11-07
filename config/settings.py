@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'reviews',
     'bookings',
     'rest_framework',
+    'graphene_django',
 ]
 
 MIDDLEWARE = [
@@ -150,3 +151,4 @@ MAILERS = {
     },
 }
 DEFAULT_FROM_EMAIL ="sumiyashimuakhy@gmail.com"
+GRAPHENE = {'SCHEMA': 'config.schema.schema'}
