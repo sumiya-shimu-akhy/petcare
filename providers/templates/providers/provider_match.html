@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="text-2xl font-bold mb-1">Smart Match</h1>
+<p class="text-sm text-gray-600 mb-4">Tell us what you need and we will rank the best providers for you.</p>
+
+<form method="get" class="bg-white rounded-lg shadow p-4 mb-4 flex flex-wrap gap-2 items-center">
+  <select name="service" class="border rounded px-2 py-1">
+    <option value="">Any service</option>
+    {% for value, label in service_types %}
+      <option value="{{ value }}" {% if value == service %}selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+  </select>
+  <input type="text" name="area" placeholder="Your area" value="{{ area }}" class="border rounded px-2 py-1">
+  <input type="number" name="budget" min="0" placeholder="Max budget (BDT)" value="{{ budget|default_if_none:'' }}" class="border rounded px-2 py-1">
+  <button type="submit" class="bg-indigo-600 text-white px-4 py-1 rounded hover:bg-indigo-700">Find best match</button>
+</form>
+
+{% if searched %}
+  {% for r in results %}
+    <div class="bg-white rounded-lg shadow p-4 mb-3 flex gap-4">
+      {% if r.provider.photo %}<img src="{{ r.provider.photo.url }}" class="w-20 h-20 object-cover rounded-lg">{% endif %}
+      <div class="flex-1">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-semibold">
+            <a href="/providers/{{ r.provider.id }}/" class="text-indigo-600 hover:underline">{{ r.provider.user.username }} - {{ r.provider.get_service_type_display }}</a>
+          </h3>
+          <span class="font-bold text-indigo-600">{{ r.score }}% match</span>
+        </div>
+        <div class="bg-gray-200 rounded h-2 my-2">
+          <div class="bg-indigo-600 h-2 rounded" style="width: {{ r.score }}%"></div>
+        </div>
+        <p class="text-sm text-gray-600">Area: {{ r.provider.area }} | Fee: {{ r.provider.fee }} BDT</p>
+        <p class="text-sm text-gray-700 mt-1">{{ r.reasons|join:" • " }}</p>
+      </div>
+    </div>
+  {% empty %}
+    <p class="text-gray-500">No verified providers yet.</p>
+  {% endfor %}
+{% endif %}
+{% endblock %}
