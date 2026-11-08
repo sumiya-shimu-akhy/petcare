@@ -3,7 +3,7 @@
 {% block content %}
 <h1 class="text-2xl font-bold mb-4">Find a Service Provider</h1>
 
-<form method="get" class="bg-white rounded-lg shadow p-4 mb-4 flex flex-wrap gap-2">
+<form method="get" class="bg-white rounded-lg shadow p-4 mb-4 flex flex-wrap gap-2 items-center">
   <select name="service" class="border rounded px-2 py-1">
     <option value="">All services</option>
     {% for value, label in service_types %}
@@ -11,8 +11,17 @@
     {% endfor %}
   </select>
   <input type="text" name="area" placeholder="Area" value="{{ area }}" class="border rounded px-2 py-1">
+  {% if near %}
+    <input type="hidden" name="lat" value="{{ lat }}">
+    <input type="hidden" name="lng" value="{{ lng }}">
+  {% endif %}
   <button type="submit" class="bg-indigo-600 text-white px-4 py-1 rounded hover:bg-indigo-700">Search</button>
+  <button type="button" id="near-btn" class="border px-3 py-1 rounded hover:bg-gray-100">📍 Near me</button>
+  {% if near %}<a href="/providers/" class="text-sm text-indigo-600 hover:underline">Clear location</a>{% endif %}
+  <span id="near-msg" class="text-sm text-red-600"></span>
 </form>
+
+{% if near %}<p class="text-sm text-gray-600 mb-3">Sorted by distance from your location.</p>{% endif %}
 
 {% for p in page_obj %}
   <div class="bg-white rounded-lg shadow p-4 mb-3 flex gap-4">
@@ -20,6 +29,7 @@
     <div>
       <h3 class="text-lg font-semibold"><a href="/providers/{{ p.id }}/" class="text-indigo-600 hover:underline">{{ p.user.username }} - {{ p.get_service_type_display }}</a></h3>
       <p class="text-sm text-gray-600">Area: {{ p.area }} | Experience: {{ p.experience_years }} years | Fee: {{ p.fee }} BDT</p>
+      {% if near and p.distance is not None %}<p class="text-sm text-indigo-600">📍 {{ p.distance }} km away</p>{% endif %}
       <p class="text-sm">{{ p.bio }}</p>
     </div>
   </div>
@@ -29,11 +39,31 @@
 
 <div class="flex items-center gap-3 mt-4">
   {% if page_obj.has_previous %}
-    <a href="?service={{ service }}&area={{ area }}&page={{ page_obj.previous_page_number }}" class="text-indigo-600 hover:underline">Previous</a>
+    <a href="?service={{ service }}&area={{ area }}&lat={{ lat }}&lng={{ lng }}&page={{ page_obj.previous_page_number }}" class="text-indigo-600 hover:underline">Previous</a>
   {% endif %}
   <span class="text-sm text-gray-600">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
   {% if page_obj.has_next %}
-    <a href="?service={{ service }}&area={{ area }}&page={{ page_obj.next_page_number }}" class="text-indigo-600 hover:underline">Next</a>
+    <a href="?service={{ service }}&area={{ area }}&lat={{ lat }}&lng={{ lng }}&page={{ page_obj.next_page_number }}" class="text-indigo-600 hover:underline">Next</a>
   {% endif %}
 </div>
+
+<script>
+document.getElementById('near-btn').addEventListener('click', function () {
+  const msg = document.getElementById('near-msg');
+  if (!navigator.geolocation) {
+    msg.textContent = 'Location is not supported by this browser.';
+    return;
+  }
+  msg.textContent = 'Getting your location...';
+  navigator.geolocation.getCurrentPosition(function (pos) {
+    const params = new URLSearchParams(window.location.search);
+    params.set('lat', pos.coords.latitude.toFixed(6));
+    params.set('lng', pos.coords.longitude.toFixed(6));
+    params.delete('page');
+    window.location.search = params.toString();
+  }, function () {
+    msg.textContent = 'Could not get location. Please allow location access.';
+  });
+});
+</script>
 {% endblock %}

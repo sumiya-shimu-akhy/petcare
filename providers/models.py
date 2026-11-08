@@ -18,6 +18,8 @@ class ProviderProfile(models.Model):
     bio = models.TextField(blank=True)
     photo = models.ImageField(upload_to='provider_photos/', blank=True, null=True)
     video_url = models.URLField(blank=True, help_text="YouTube link of your demo video")
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
     is_verified = models.BooleanField(default=False)
 
     def __str__(self):

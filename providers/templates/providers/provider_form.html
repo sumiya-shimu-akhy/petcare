@@ -6,8 +6,28 @@
   <form method="post" enctype="multipart/form-data" class="space-y-3">
     {% csrf_token %}
     {{ form.as_p }}
+    <button type="button" id="loc-btn" class="border px-3 py-1 rounded hover:bg-gray-100">📍 Use my current location</button>
+    <span id="loc-msg" class="text-sm text-gray-600"></span>
     <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700">Save</button>
   </form>
   <p class="mt-4 text-sm text-gray-600">Note: your profile will be visible to others after admin approval.</p>
 </div>
+
+<script>
+document.getElementById('loc-btn').addEventListener('click', function () {
+  const msg = document.getElementById('loc-msg');
+  if (!navigator.geolocation) {
+    msg.textContent = 'Location is not supported by this browser.';
+    return;
+  }
+  msg.textContent = 'Getting location...';
+  navigator.geolocation.getCurrentPosition(function (pos) {
+    document.getElementById('id_latitude').value = pos.coords.latitude.toFixed(6);
+    document.getElementById('id_longitude').value = pos.coords.longitude.toFixed(6);
+    msg.textContent = 'Location added. Now press Save.';
+  }, function () {
+    msg.textContent = 'Could not get location. Please allow location access.';
+  });
+});
+</script>
 {% endblock %}

@@ -47,7 +47,7 @@
     class="max-w-xl rounded"
     style="border:0;"
     loading="lazy"
-    src="https://maps.google.com/maps?q={{ provider.area|urlencode }}&output=embed">
+   src="https://maps.google.com/maps?q={% if provider.latitude and provider.longitude %}{{ provider.latitude|stringformat:'f' }},{{ provider.longitude|stringformat:'f' }}{% else %}{{ provider.area|urlencode }}{% endif %}&output=embed"></iframe>
   </iframe>
 </div>
 
