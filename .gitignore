@@ -5,3 +5,4 @@ db.sqlite3
 .env
 media/
 email_password.txt
+ai_key.txt

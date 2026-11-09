@@ -152,3 +152,10 @@ MAILERS = {
 }
 DEFAULT_FROM_EMAIL ="sumiyashimuakhy@gmail.com"
 GRAPHENE = {'SCHEMA': 'config.schema.schema'}
+def _read_secret(name):
+    f = BASE_DIR / name
+    return ''.join(f.read_text().split()) if f.exists() else ''
+
+
+GEMINI_API_KEY = _read_secret('ai_key.txt')
+GEMINI_MODEL = 'gemini-flash-lite-latest'
