@@ -159,3 +159,18 @@ def _read_secret(name):
 
 GEMINI_API_KEY = _read_secret('ai_key.txt')
 GEMINI_MODEL = 'gemini-flash-lite-latest'
+def _read_cloudinary():
+    f = BASE_DIR / 'cloudinary.txt'
+    if not f.exists():
+        return '', ''
+    lines = [x.strip() for x in f.read_text().splitlines() if x.strip()]
+    return (lines[0], lines[1]) if len(lines) >= 2 else ('', '')
+
+
+CLOUDINARY_CLOUD_NAME, CLOUDINARY_UPLOAD_PRESET = _read_cloudinary()
+
+if CLOUDINARY_CLOUD_NAME and CLOUDINARY_UPLOAD_PRESET:
+    STORAGES = {
+        'default': {'BACKEND': 'config.storage.CloudinaryStorage'},
+        'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'},
+    }

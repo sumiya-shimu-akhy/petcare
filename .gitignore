@@ -6,3 +6,5 @@ db.sqlite3
 media/
 email_password.txt
 ai_key.txt
+
+cloudinary.txt
