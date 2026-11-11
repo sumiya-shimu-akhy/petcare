@@ -3,6 +3,15 @@
 {% block content %}
 <div class="max-w-md mx-auto bg-white rounded-lg shadow p-6">
   <h1 class="text-2xl font-bold mb-4">Add a Pet</h1>
+
+  <div class="border rounded p-3 mb-4 bg-gray-50">
+    <p class="text-sm font-semibold mb-1">🤖 Auto-detect pet type from a photo (optional)</p>
+    <p class="text-xs text-gray-500 mb-2">The photo stays on your device. The AI model runs inside your browser.</p>
+    <input type="file" id="pet-photo" accept="image/*" class="text-sm">
+    <img id="pet-preview" class="hidden mt-2 w-32 h-32 object-cover rounded" alt="">
+    <p id="ai-msg" class="text-sm mt-2 text-gray-700"></p>
+  </div>
+
   <form method="post" class="space-y-3">
     {% csrf_token %}
     {{ form.as_p }}
@@ -10,4 +19,74 @@
   </form>
   <a href="/pets/" class="block mt-4 text-sm text-indigo-600 hover:underline">&larr; Back to My Pets</a>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
+<script>
+(function () {
+  const fileInput = document.getElementById('pet-photo');
+  const preview = document.getElementById('pet-preview');
+  const msg = document.getElementById('ai-msg');
+  const typeSelect = document.getElementById('id_pet_type');
+  const NAMES = {dog: 'Dog', cat: 'Cat', bird: 'Bird', rabbit: 'Rabbit'};
+  // Ranges of ImageNet classes (inclusive) that belong to each pet type
+  const GROUPS = {
+    dog: [[151, 268]],
+    cat: [[281, 285]],
+    bird: [[7, 24], [80, 100], [127, 146]],
+    rabbit: [[330, 332]]
+  };
+  let modelPromise = null;
+
+  function getModel() {
+    if (!modelPromise) {
+      msg.textContent = 'Loading the AI model (first time only, needs internet)...';
+      modelPromise = mobilenet.load();
+    }
+    return modelPromise;
+  }
+
+  async function detect() {
+    try {
+      const model = await getModel();
+      msg.textContent = 'Looking at the photo...';
+      const logits = model.infer(preview);
+      const soft = tf.softmax(logits);
+      const probs = await soft.data();
+      logits.dispose();
+      soft.dispose();
+
+      let bestName = '';
+      let bestScore = 0;
+      for (const name in GROUPS) {
+        let sum = 0;
+        for (const range of GROUPS[name]) {
+          for (let i = range[0]; i <= range[1]; i++) { sum += probs[i]; }
+        }
+        if (sum > bestScore) { bestScore = sum; bestName = name; }
+      }
+
+      if (bestScore >= 0.35) {
+        if (typeSelect) { typeSelect.value = bestName; }
+        msg.textContent = 'Looks like a ' + NAMES[bestName] + ' (' + Math.round(bestScore * 100) +
+          '% sure). Pet type was filled in. Please change it if this is wrong.';
+      } else {
+        msg.textContent = 'Not sure what pet this is. Please choose the type yourself.';
+      }
+    } catch (err) {
+      console.error(err);
+      modelPromise = null;
+      msg.textContent = 'Could not run the AI model (check your internet). You can choose the pet type yourself.';
+    }
+  }
+
+  fileInput.addEventListener('change', function () {
+    const file = fileInput.files[0];
+    if (!file) { return; }
+    preview.onload = detect;
+    preview.src = URL.createObjectURL(file);
+    preview.classList.remove('hidden');
+  });
+})();
+</script>
 {% endblock %}
