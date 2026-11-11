@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>[v-cloak] { display: none; }</style>
+
+<div id="app" v-cloak>
+  <h1 class="text-2xl font-bold mb-1">Browse Providers</h1>
+  <p class="text-xs text-gray-500 mb-3">This page is built with Vue 3 and loads data from the REST API.</p>
+
+  <div class="bg-white rounded-lg shadow p-4 mb-4 flex flex-wrap gap-2 items-center">
+    <input v-model="search" type="text" placeholder="Search name or area..."
+           class="border rounded px-2 py-1 flex-1 min-w-[10rem]">
+    <select v-model="service" class="border rounded px-2 py-1">
+      <option value="">All services</option>
+      <option v-for="s in services" :key="s.value" :value="s.value">[[ s.label ]]</option>
+    </select>
+    <select v-model="sort" class="border rounded px-2 py-1">
+      <option value="rating">Best rated</option>
+      <option value="fee_low">Fee: low to high</option>
+      <option value="exp">Most experienced</option>
+    </select>
+  </div>
+
+  <p v-if="loading" class="text-gray-500">Loading providers...</p>
+  <p v-else-if="error" class="text-red-600">[[ error ]]</p>
+  <div v-else>
+    <p class="text-sm text-gray-600 mb-2">[[ filtered.length ]] provider(s) found</p>
+
+    <div v-for="p in pageItems" :key="p.id" class="bg-white rounded-lg shadow p-4 mb-3 flex gap-4">
+      <img v-if="p.photo" :src="p.photo" class="w-20 h-20 object-cover rounded-lg" alt="">
+      <div>
+        <h3 class="text-lg font-semibold">
+          <a :href="'/providers/' + p.id + '/'" class="text-indigo-600 hover:underline">[[ p.username ]] - [[ p.service_type_display ]]</a>
+        </h3>
+        <p class="text-sm text-gray-600">Area: [[ p.area ]] | Experience: [[ p.experience_years ]] years | Fee: [[ p.fee ]] BDT</p>
+        <p v-if="p.review_count" class="text-sm">&#9733; [[ p.average_rating ]] ([[ p.review_count ]] reviews)</p>
+        <p v-else class="text-sm text-gray-500">No reviews yet</p>
+      </div>
+    </div>
+
+    <p v-if="filtered.length === 0" class="text-gray-500">No providers match your search.</p>
+
+    <div v-if="totalPages > 1" class="flex items-center gap-3 mt-4">
+      <button @click="page--" :disabled="page === 1" class="border px-3 py-1 rounded disabled:opacity-40">Previous</button>
+      <span class="text-sm text-gray-600">Page [[ page ]] of [[ totalPages ]]</span>
+      <button @click="page++" :disabled="page === totalPages" class="border px-3 py-1 rounded disabled:opacity-40">Next</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@3.5.13/dist/vue.global.prod.js"></script>
+<script>
+const { createApp, ref, computed, watch, onMounted } = Vue;
+
+createApp({
+  delimiters: ['[[', ']]'],
+  setup() {
+    const providers = ref([]);
+    const loading = ref(true);
+    const error = ref('');
+    const search = ref('');
+    const service = ref('');
+    const sort = ref('rating');
+    const page = ref(1);
+    const perPage = 3;
+    const services = [
+      { value: 'vet', label: 'Veterinarian' },
+      { value: 'groomer', label: 'Groomer' },
+      { value: 'sitter', label: 'Pet Sitter' },
+      { value: 'trainer', label: 'Trainer' }
+    ];
+
+    onMounted(async () => {
+      try {
+        const res = await fetch('/providers/api/');
+        if (!res.ok) { throw new Error('Server error ' + res.status); }
+        providers.value = await res.json();
+      } catch (e) {
+        error.value = 'Could not load providers. Please try again.';
+      } finally {
+        loading.value = false;
+      }
+    });
+
+    const filtered = computed(() => {
+      const q = search.value.trim().toLowerCase();
+      let list = providers.value.filter(p =>
+        (!service.value || p.service_type === service.value) &&
+        (!q || p.username.toLowerCase().includes(q) || p.area.toLowerCase().includes(q))
+      );
+      if (sort.value === 'fee_low') {
+        list = [...list].sort((a, b) => a.fee - b.fee);
+      } else if (sort.value === 'exp') {
+        list = [...list].sort((a, b) => b.experience_years - a.experience_years);
+      } else {
+        list = [...list].sort((a, b) => (b.average_rating || 0) - (a.average_rating || 0));
+      }
+      return list;
+    });
+
+    const totalPages = computed(() => Math.max(1, Math.ceil(filtered.value.length / perPage)));
+    const pageItems = computed(() => filtered.value.slice((page.value - 1) * perPage, page.value * perPage));
+    watch([search, service, sort], () => { page.value = 1; });
+
+    return { loading, error, search, service, sort, page, services, filtered, totalPages, pageItems };
+  }
+}).mount('#app');
+</script>
+{% endblock %}
