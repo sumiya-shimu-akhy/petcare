@@ -8,6 +8,7 @@
     {% if provider.photo %}<img src="{{ provider.photo.url }}" class="w-28 h-28 object-cover rounded-lg">{% endif %}
     <div>
       <h1 class="text-2xl font-bold">{{ provider.user.username }} - {{ provider.get_service_type_display }}</h1>
+            {% if provider.user.profile.phone_verified %}<p class="text-sm text-green-700">&#9989; Phone verified</p>{% endif %}
       <p class="text-sm text-gray-600">Area: {{ provider.area }} | Experience: {{ provider.experience_years }} years | Fee: {{ provider.fee }} BDT</p>
       <p class="mt-1">{{ provider.bio }}</p>
     </div>

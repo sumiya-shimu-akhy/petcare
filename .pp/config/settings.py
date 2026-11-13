@@ -125,3 +125,5 @@ MAILERS = {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
 }
+SMS_MODE = 'console'
+SMS_DAILY_LIMIT = 50

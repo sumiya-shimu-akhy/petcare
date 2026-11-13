@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-white rounded-lg shadow p-6">
+  <h1 class="text-2xl font-bold mb-2">Verify your phone (optional)</h1>
+  <p class="text-sm text-gray-600 mb-3">
+    Your email is already enough to use this site. A verified phone number adds a trust badge to your profile.
+    We send <b>one SMS</b> with a 6-digit code. <b>It is free for you</b> (the site pays for it).
+    You can request up to 3 codes per hour.
+  </p>
+
+  {% if demo %}
+    <p class="bg-yellow-100 text-yellow-800 rounded p-2 mb-3 text-sm">
+      Demo mode: no real SMS is sent. The code is shown in the server terminal.
+    </p>
+  {% endif %}
+
+  {% if profile.phone_verified %}
+    <p class="bg-green-100 text-green-800 rounded p-3 mb-3 text-sm">&#9989; Your phone {{ profile.phone }} is verified.</p>
+  {% endif %}
+
+  {% if error %}<p class="text-red-600 mb-3 text-sm">{{ error }}</p>{% endif %}
+
+  <form method="post" class="space-y-3">
+    {% csrf_token %}
+    <input type="text" name="phone" value="{{ profile.phone }}" placeholder="01712345678" inputmode="tel"
+           class="border rounded w-full px-3 py-2" required>
+    <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700">Send code</button>
+  </form>
+</div>
+{% endblock %}

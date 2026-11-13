@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-white rounded-lg shadow p-6">
+  <h1 class="text-2xl font-bold mb-2">Enter the code</h1>
+  <p class="text-sm text-gray-600 mb-3">We sent a 6-digit code to <b>{{ phone }}</b>. It is valid for 10 minutes.</p>
+
+  {% if demo %}
+    <p class="bg-yellow-100 text-yellow-800 rounded p-2 mb-3 text-sm">
+      Demo mode: look for the code in the server terminal (VS Code).
+    </p>
+  {% endif %}
+
+  {% if error %}<p class="text-red-600 mb-3 text-sm">{{ error }}</p>{% endif %}
+
+  <form method="post" class="space-y-3">
+    {% csrf_token %}
+    <input type="text" name="code" maxlength="6" inputmode="numeric" placeholder="6-digit code"
+           class="border rounded w-full px-3 py-2 tracking-widest text-center text-lg" required>
+    <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700">Verify</button>
+  </form>
+  <a href="/phone/" class="block mt-4 text-sm text-indigo-600 hover:underline">&larr; Use a different number or resend</a>
+</div>
+{% endblock %}
