@@ -1,9 +1,11 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from . import views, phone_views
+from . import views, phone_views, pwa_views
 
 urlpatterns = [
     path('', views.home, name='home'),
+    path('manifest.webmanifest', pwa_views.manifest, name='manifest'),
+    path('sw.js', pwa_views.service_worker, name='service_worker'),
     path('signup/', views.signup, name='signup'),
     path('verify/', views.verify_otp, name='verify_otp'),
     path('verify/resend/', views.resend_otp, name='resend_otp'),

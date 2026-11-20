@@ -169,8 +169,14 @@ def _read_cloudinary():
 
 CLOUDINARY_CLOUD_NAME, CLOUDINARY_UPLOAD_PRESET = _read_cloudinary()
 
+CLOUDINARY_CLOUD_NAME, CLOUDINARY_UPLOAD_PRESET = _read_cloudinary()
+
 if CLOUDINARY_CLOUD_NAME and CLOUDINARY_UPLOAD_PRESET:
     STORAGES = {
         'default': {'BACKEND': 'config.storage.CloudinaryStorage'},
         'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'},
     }
+
+if (BASE_DIR / 'demo_mode.txt').exists():
+    ALLOWED_HOSTS = ['*']
+    CSRF_TRUSTED_ORIGINS = ['https://*.trycloudflare.com']
