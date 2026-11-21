@@ -10,3 +10,8 @@ ai_key.txt
 cloudinary.txt
 
 demo_mode.txt
+
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
