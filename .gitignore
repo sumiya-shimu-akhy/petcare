@@ -15,3 +15,7 @@ android/.gradle/
 android/build/
 android/app/build/
 android/local.properties
+
+production.txt
+secret_key.txt
+staticfiles/

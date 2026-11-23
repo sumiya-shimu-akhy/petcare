@@ -1,5 +1,6 @@
+import math
+
 from django.db.models import Avg
-from sklearn.neighbors import NearestNeighbors
 
 from .models import ProviderProfile
 
@@ -7,6 +8,29 @@ from .models import ProviderProfile
 W_SERVICE, W_AREA, W_FEE, W_EXP, W_RATING = 3.0, 2.0, 1.5, 0.5, 1.0
 # Largest possible distance, used to turn a distance into a 0-100 match score
 MAX_DIST = (2 * W_SERVICE**2 + 2 * W_AREA**2 + W_FEE**2 + W_EXP**2 + W_RATING**2) ** 0.5
+
+
+def nearest(vectors, query, k):
+    """Return (distance, index) for the k vectors closest to the query.
+
+    Uses scikit-learn's NearestNeighbors when it is installed. Otherwise the
+    same Euclidean distance is computed in plain Python (used on the live server).
+    """
+    try:
+        from sklearn.neighbors import NearestNeighbors
+    except ImportError:
+        NearestNeighbors = None
+
+    if NearestNeighbors is not None:
+        model = NearestNeighbors(n_neighbors=k).fit(vectors)
+        distances, indexes = model.kneighbors([query])
+        return [(float(d), int(i)) for d, i in zip(distances[0], indexes[0])]
+
+    ranked = sorted(
+        (math.sqrt(sum((a - b) ** 2 for a, b in zip(row, query))), i)
+        for i, row in enumerate(vectors)
+    )
+    return ranked[:k]
 
 
 def recommend(service='', area='', budget=None, top_n=5):
@@ -44,11 +68,9 @@ def recommend(service='', area='', budget=None, top_n=5):
 
     X = [provider_vector(p) for p in providers]
     k = min(top_n, len(providers))
-    model = NearestNeighbors(n_neighbors=k).fit(X)
-    distances, indexes = model.kneighbors([query])
 
     results = []
-    for dist, i in zip(distances[0], indexes[0]):
+    for dist, i in nearest(X, query, k):
         p = providers[i]
         reasons = []
         if service and p.service_type == service:

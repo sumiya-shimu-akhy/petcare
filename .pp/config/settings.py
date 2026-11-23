@@ -127,3 +127,22 @@ MAILERS = {
 }
 SMS_MODE = 'console'
 SMS_DAILY_LIMIT = 50
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+_secret = _read_secret('secret_key.txt')
+if _secret:
+    SECRET_KEY = _secret
+
+# On the live server a file named production.txt holds the site address
+# (for example yourname.pythonanywhere.com). Without that file nothing changes.
+if (BASE_DIR / 'production.txt').exists():
+    import os as _os
+    _site = (BASE_DIR / 'production.txt').read_text().strip()
+    DEBUG = False
+    ALLOWED_HOSTS = [_site]
+    CSRF_TRUSTED_ORIGINS = ['https://' + _site]
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    # Free PythonAnywhere accounts reach the internet through this proxy
+    _os.environ.setdefault('https_proxy', 'http://proxy.server:3128')
+    _os.environ.setdefault('http_proxy', 'http://proxy.server:3128')
