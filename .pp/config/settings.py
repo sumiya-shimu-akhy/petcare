@@ -143,6 +143,7 @@ if (BASE_DIR / 'production.txt').exists():
     CSRF_TRUSTED_ORIGINS = ['https://' + _site]
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+
     # Free PythonAnywhere accounts reach the internet through this proxy
     _os.environ.setdefault('https_proxy', 'http://proxy.server:3128')
     _os.environ.setdefault('http_proxy', 'http://proxy.server:3128')
