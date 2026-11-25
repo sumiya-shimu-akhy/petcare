@@ -21,6 +21,7 @@ import android.webkit.WebViewClient
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ProgressBar
+
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -143,14 +144,14 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        askServerAddress(null)
+        webView.loadUrl("https://sumiyapetcare.pythonanywhere.com")
     }
 
     private fun askServerAddress(message: String?) {
         val prefs = getSharedPreferences("petcare", Context.MODE_PRIVATE)
         val input = EditText(this)
         input.inputType = InputType.TYPE_TEXT_VARIATION_URI
-        input.setText(prefs.getString("url", "https://"))
+        input.setText("https://sumiyapetcare.pythonanywhere.com")
         input.setSelection(input.text.length)
 
         val container = FrameLayout(this)
